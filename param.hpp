@@ -1,9 +1,11 @@
 #ifndef PARAM_HPP
 #define PARAM_HPP
-#define MAXARGS 32
+
 #include <string>
 #include <vector>
 #include <iostream>
+
+#define MAXARGS 32
 
 class Param{
 	private:
@@ -11,10 +13,10 @@ class Param{
 		char *outputRedirect; /* file name or NULL */
 		int argumentCount; /* number of tokens in argument vector */
 		char *argumentVector[MAXARGS]; /* array of strings */
+		void ParseCommandLine(std::vector<std::string>);
 	public:
 		Param(std::vector<std::string>);
 		void PrintParams();
-		void ParseCommandLine(std::vector<std::string>);
 };
 
 #endif
