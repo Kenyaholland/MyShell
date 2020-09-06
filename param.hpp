@@ -1,9 +1,10 @@
 #ifndef PARAM_HPP
 #define PARAM_HPP
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
+#include <cstdlib>
 
 #define MAXARGS 32
 
@@ -17,6 +18,7 @@ class Param{
 	public:
 		Param(std::vector<std::string>);
 		void PrintParams();
+		void CheckArguments();
 };
 
 #endif
