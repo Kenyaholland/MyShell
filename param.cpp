@@ -88,3 +88,19 @@ void Param::CheckArguments(){
 		exit(1);
 	}
 }
+
+
+const char* Param::getNumProcesses(){
+	const char* processes = this->argumentVector[1];
+	return processes;
+}
+
+const char* Param::getFileName(){
+	const char *name = this->argumentVector[0];
+	return name;
+}
+
+const char* Param::getInputRedirect(){
+	const char* input = this->inputRedirect;
+	return input;
+}

@@ -17,6 +17,9 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "parse.hpp"
 #include "param.hpp"
 
@@ -53,5 +56,22 @@ int main(int argc, char *argv[]){
 				break;
 			}
 		}
+		
+		int processes = atoi(param.getNumProcesses());
+		
+		for(int i = 0; i < processes; i++){
+			int pid = fork();
+			if(pid == 0){
+				std::string tempSegment = std::to_string(i);
+				const char* segment = tempSegment.c_str();
+				execlp(param.getFileName(),param.getFileName(),param.getNumProcesses(),segment,param.getInputRedirect(),NULL);
+			}
+			/*
+			else{
+				wait(NULL);
+			}
+			*/
+		}
+		wait(NULL);
 	}
 }

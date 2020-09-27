@@ -82,6 +82,11 @@ class Param{
 		 *  @return void
 		 */
 		void CheckArguments();
+		
+		const char* getNumProcesses();
+		const char* getFileName();
+		const char* getInputRedirect();
+		
 };
 
 #endif
