@@ -99,24 +99,24 @@ bool Param::CheckArgumentTwo(){
 	return true;
 }
 
-const char* Param::GetNumProcesses(){
-	const char* processes = this->argumentVector[1];
-	return processes;
+char* Param::GetNumProcesses(){
+	//const char* processes = this->argumentVector[1];
+	return this->argumentVector[1];
 }
 
-const char* Param::GetFileName(){
-	const char *name = this->argumentVector[0];
-	return name;
+char* Param::GetFileName(){
+	//const char *name = this->argumentVector[0];
+	return this->argumentVector[0];
 }
 
-const char* Param::GetRange(){
-	const char *range = this->argumentVector[2];
-	return range;
+char* Param::GetRange(){
+	//const char *range = this->argumentVector[2];
+	return this->argumentVector[2];
 }
 
-const char* Param::GetInputRedirect(){
-	const char* input = this->inputRedirect;
-	return input;
+char* Param::GetInputRedirect(){
+	//const char* input = this->inputRedirect;
+	return this->inputRedirect;
 }
 
 const char* Param::GetOutputRedirect(){

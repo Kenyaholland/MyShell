@@ -86,34 +86,35 @@ int main(int argc, char *argv[]){
 						freopen(fileName,"w",stdout);
 					}
 					
-					std::string tempSegment = std::to_string(i);
-					const char* segment = tempSegment.c_str();
-					
-					if(param.GetInputRedirect() == nullptr){
-						failed = execlp(param.GetFileName(),param.GetFileName(),
-							param.GetNumProcesses(),segment,
-							param.GetRange(),NULL);
+					std::string indexStr = std::to_string(i);
+					char *indexChar = const_cast<char*>(indexStr.c_str());
 						
-						if(failed == -1){
-							std::cout << "ERROR: file not found" << std::endl;
-							exit(1);
-						}
+					std::string tempInput;
+						
+					if(param.GetInputRedirect() != nullptr){	
+						tempInput = param.GetInputRedirect();
+						tempInput.erase(0,1);
 					}
 					else{
-						std::string tempInput(param.GetInputRedirect());
-						tempInput.erase(0,1);
-						const char* inputRange = const_cast<const char*>(tempInput.c_str());
-						
-						failed = execlp(param.GetFileName(),param.GetFileName(),
-							param.GetNumProcesses(),segment,
-							inputRange,NULL);
-						
-						if(failed == -1){
-							std::cout << "ERROR: file not found" << std::endl;
-							exit(1);
-						}
+						tempInput = param.GetRange();
 					}
 					
+					char* value = const_cast<char*>(tempInput.c_str());
+						
+					char* args[] = {
+						param.GetFileName(),
+						param.GetNumProcesses(),
+						indexChar,
+						value,
+						NULL
+					};
+						
+					failed = execvp(args[0], args);
+						
+					if(failed == -1){
+						std::cout << "ERROR: file not found" << std::endl;
+						exit(1);
+					}
 				}
 				else{
 					int status;

@@ -31,8 +31,6 @@ class Param{
 
 		/*  array of strings  */
 		char *argumentVector[MAXARGS];
-		
-
 	public:
 	
 		/** @brief Constructor
@@ -85,10 +83,10 @@ class Param{
 		 *  @return void
 		 */
 		bool Initialize(char**,int);
-		const char* GetNumProcesses();
-		const char* GetFileName();
-		const char* GetRange();
-		const char* GetInputRedirect();
+		char* GetNumProcesses();
+		char* GetFileName();
+		char* GetRange();
+		char* GetInputRedirect();
 		const char* GetOutputRedirect();
 		void FreeMemory();
 };
