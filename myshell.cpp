@@ -25,9 +25,8 @@
 
 int main(int argc, char *argv[]){
 	bool proceed = true;
-	//bool isError = false;
 	/*  loops until exit entered by user or error in command line  */
-	while(proceed){
+	while(proceed == true){
 		/*  local variables  */
 		
 		std::string command;
@@ -35,7 +34,7 @@ int main(int argc, char *argv[]){
 		Param param;
 		/*  read in user command input  */
 		do{
-			std::cout << "$$$ ";
+			std::cout << "\n$$$ ";
 			std::getline(std::cin, command);
 
 			if(!command.empty()){
@@ -56,11 +55,10 @@ int main(int argc, char *argv[]){
 			}
 		}while(command.empty());
 		
-		if(proceed){
+		if(proceed == true){
 			/*  check for Debug keyword to print the Debug version of Param object  */
 			std::string debug = "-Debug";
 			std::string toCompare;
-			
 			
 			for(int i = 0; i < argc; i++){
 				toCompare = *(argv+i);	
@@ -72,6 +70,7 @@ int main(int argc, char *argv[]){
 			}
 			
 			int processes = atoi(param.GetNumProcesses());
+			int failed = 0;
 			
 			for(int i = 0; i < processes; i++){
 				int pid = fork();
@@ -91,29 +90,44 @@ int main(int argc, char *argv[]){
 					const char* segment = tempSegment.c_str();
 					
 					if(param.GetInputRedirect() == nullptr){
-						execlp(param.GetFileName(),param.GetFileName(),
+						failed = execlp(param.GetFileName(),param.GetFileName(),
 							param.GetNumProcesses(),segment,
 							param.GetRange(),NULL);
+						
+						if(failed == -1){
+							std::cout << "ERROR: file not found" << std::endl;
+							exit(1);
+						}
 					}
 					else{
 						std::string tempInput(param.GetInputRedirect());
 						tempInput.erase(0,1);
 						const char* inputRange = const_cast<const char*>(tempInput.c_str());
-						execlp(param.GetFileName(),param.GetFileName(),
+						
+						failed = execlp(param.GetFileName(),param.GetFileName(),
 							param.GetNumProcesses(),segment,
 							inputRange,NULL);
+						
+						if(failed == -1){
+							std::cout << "ERROR: file not found" << std::endl;
+							exit(1);
+						}
 					}
+					
 				}
 				else{
-					wait(NULL);
+					int status;
+					wait(&status);
+					if(status == 256){
+						std::cout << "PROGRAM TERMINATED" << std::endl;
+						exit(1);
+					}
 
 				}
-			}
+			}	
 		}
-		
 		//param.FreeMemory();
 		//toParse.FreeMemory();
-		proceed = true;
-		
+		proceed = true;	
 	}
 }

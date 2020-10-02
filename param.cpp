@@ -82,12 +82,20 @@ void Param::CheckExit(){
 }
 
 bool Param::CheckArgumentTwo(){
-	int argumentTwo = atoi(this->argumentVector[1]);
-	
-	if(argumentTwo == 0){
-		std::cout << "ERROR: second argument must be integer" << std::endl;
+	if(argumentCount < 2){
+		std::cout << "ERROR: enter correct filename and/or number of processes" << std::endl;
 		return false;
 	}
+	
+	if(argumentCount > 1){
+		int argumentTwo = atoi(this->argumentVector[1]);
+	
+		if(argumentTwo == 0){
+			std::cout << "ERROR: second argument must be integer" << std::endl;
+			exit(1);
+		}
+	}
+	
 	return true;
 }
 
