@@ -25,11 +25,12 @@
 
 int main(int argc, char *argv[]){
 	bool proceed = true;
+	//bool isError = false;
 	/*  loops until exit entered by user or error in command line  */
 	while(proceed){
 		/*  local variables  */
+		
 		std::string command;
-		bool integer = true;
 		Parse toParse;
 		Param param;
 		/*  read in user command input  */
@@ -46,23 +47,14 @@ int main(int argc, char *argv[]){
 				/*  create Param object and intialized variables with tokens
 				 *  check for errors within the tokenized command input 
 				 */
-				param.Initialize(tokenizedCommand, toParse.GetMaxTokens());
-				proceed = param.CheckExit();
-				/*
-				int argumentTwo = atoi(param.GetNumProcesses());
+				proceed = param.Initialize(tokenizedCommand, toParse.GetMaxTokens());
+				param.CheckExit();
 				
-				if(argumentTwo == 0){
-					std::cout << "ERROR: second argument must be integer" << std::endl;
-					integer = false;
+				if(proceed == true){
+					proceed = param.CheckArgumentTwo();
 				}
-				if(!integer){
-					std::cout << "i freed the memory\n";
-					toParse.FreeMemory();
-					param.FreeMemory();
-				}*/
 			}
-		}while(command.empty() || integer == false);
-		
+		}while(command.empty());
 		
 		if(proceed){
 			/*  check for Debug keyword to print the Debug version of Param object  */
@@ -118,5 +110,10 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
+		
+		//param.FreeMemory();
+		//toParse.FreeMemory();
+		proceed = true;
+		
 	}
 }

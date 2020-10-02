@@ -41,7 +41,6 @@ int Parse::GetMaxTokens(){
 }
 
 void Parse::FreeMemory(){
-	
 	for(int i = 0; i < this->maxTokens; i++){
 		delete[] this->tokens[i];
 	}

@@ -17,7 +17,7 @@ Param::Param(){
 	this->argumentCount = 0;
 }
 
-void Param::Initialize(char** tokenizedCommand,int maxTokens){
+bool Param::Initialize(char** tokenizedCommand,int maxTokens){
 	/*  counter  */
 	int numOfArgs = 0;
 	
@@ -28,12 +28,12 @@ void Param::Initialize(char** tokenizedCommand,int maxTokens){
 		 *  and increment the counter for the total number of arguments.
 		 */
 		if(tokenizedCommand[i][0] == '<' && tokenizedCommand[i][1] == '\0'){
-			std::cout << "ERROR: specify input name" << std::endl << "PROGRAM TERMINATED" << std::endl;
-			exit(1);
+			std::cout << "ERROR: specify input name" << std::endl;
+			return false;
 		}
 		else if(tokenizedCommand[i][0] == '>' && tokenizedCommand[i][1] == '\0'){
-			std::cout << "ERROR: specify output name" << std::endl << "PROGRAM TERMINATED" << std::endl;
-			exit(1);
+			std::cout << "ERROR: specify output name" << std::endl;
+			return false;
 		}
 		else if(tokenizedCommand[i][0] == '<' && tokenizedCommand[i][0] != '\0'){
 			this->inputRedirect = tokenizedCommand[i];
@@ -42,16 +42,13 @@ void Param::Initialize(char** tokenizedCommand,int maxTokens){
 			this->outputRedirect = tokenizedCommand[i];
 		}
 		else{
-			//if(numOfArgs == 1){
-			//	if(atoi(tokenizedCommand[i]) != 0){
-					this->argumentVector[numOfArgs] = tokenizedCommand[i];
-			//	}
-			//}
+			this->argumentVector[numOfArgs] = tokenizedCommand[i];
 			numOfArgs++;
 		}
 	}
 	
 	this->argumentCount = numOfArgs;
+	return true;
 }
 
 
@@ -66,7 +63,7 @@ void Param::PrintParams(){
 	}
 }
 
-bool Param::CheckExit(){
+void Param::CheckExit(){
 	std::string toExit = "exit";
 	std::string toCompare;
 
@@ -79,15 +76,20 @@ bool Param::CheckExit(){
 	
 		if(toCompare == toExit){
 			std::cout << "PROGRAM TERMINATED" << std::endl;
-			return false;
+			exit(0);
 		}
 	}
-
-	/*  If atoi() returns 0, then the input for the second argument is not a number and is invalid  */
-	
-	return true;
 }
 
+bool Param::CheckArgumentTwo(){
+	int argumentTwo = atoi(this->argumentVector[1]);
+	
+	if(argumentTwo == 0){
+		std::cout << "ERROR: second argument must be integer" << std::endl;
+		return false;
+	}
+	return true;
+}
 
 const char* Param::GetNumProcesses(){
 	const char* processes = this->argumentVector[1];

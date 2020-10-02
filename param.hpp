@@ -65,8 +65,8 @@ class Param{
 		 *
 		 *  @return void
 		 */
-		bool CheckExit();
-		
+		void CheckExit();
+		bool CheckArgumentTwo();
 		/** @brief Assigns tokens from a vector to respective variables.
 		 *
 		 *  This function uses an if-else structure to do error
@@ -84,7 +84,7 @@ class Param{
 		 *  @param inputCommand Vector of parsed strings from user input.
 		 *  @return void
 		 */
-		void Initialize(char**,int);
+		bool Initialize(char**,int);
 		const char* GetNumProcesses();
 		const char* GetFileName();
 		const char* GetRange();
