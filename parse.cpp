@@ -10,29 +10,41 @@
 
 #include "parse.hpp"
 
-std::vector<std::string> Parse::Parsing(std::string command){
-	/*  stores a word  */
-	char *token;
+Parse::Parse(){
+	this->tokens = nullptr;
+	this->maxTokens = 0;
+}
 
-	/*  a char to store the the user input, command  */
-	char tempCommand[command.length()+1];
-	
-	/*  copies command to tempCommand, 
-	 *  convert from string to char
-	 */
-	strcpy(tempCommand,command.c_str());
+char** Parse::Tokenize(std::string *commandPtr){
+	char* convertString = const_cast<char*>(commandPtr->c_str());
 
-	/*  tokenize the first word in tempCommand until a space is detected  */
-	token = strtok(tempCommand, " ");
+	char* token = strtok(convertString, " ");
+	std::vector<char*> holdTokens;
 
-	/*  pushes the token onto the vector parsed, then
-	 *  assigns token the next word and loops until
-	 *  end of line
-	 */
 	while(token != NULL){
-		this->parsed.push_back(token);
+		this->maxTokens++;
+		holdTokens.push_back(token);
 		token = strtok(NULL, " ");
 	}
+	
+	this->tokens = new char*[maxTokens];
+	
+	for(int i = 0; i < maxTokens; i++){
+		this->tokens[i] = holdTokens.at(i);
+	}
 
-	return this->parsed;
+	return this->tokens;
+}
+
+int Parse::GetMaxTokens(){
+	return this->maxTokens;
+}
+
+void Parse::FreeMemory(){
+	
+	for(int i = 0; i < this->maxTokens; i++){
+		delete[] this->tokens[i];
+	}
+	delete[] this->tokens;
+	
 }

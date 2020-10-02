@@ -24,54 +24,99 @@
 #include "param.hpp"
 
 int main(int argc, char *argv[]){
+	bool proceed = true;
 	/*  loops until exit entered by user or error in command line  */
-	while(1){
+	while(proceed){
 		/*  local variables  */
 		std::string command;
-		std::vector<std::string> parsedCommand;
-
-		/*  read in user command input  */
-		std::cout << "$$$ ";
-		std::getline(std::cin, command);
-
-		/*  create Parse object to tokenize command input  */
+		bool integer = true;
 		Parse toParse;
-		parsedCommand = toParse.Parsing(command); 
+		Param param;
+		/*  read in user command input  */
+		do{
+			std::cout << "$$$ ";
+			std::getline(std::cin, command);
 
-		/*  create Param object and intialized variables with tokens
-		 *  check for errors within the tokenized command input 
-		 */
-		Param param(parsedCommand);
-		param.CheckArguments();
+			if(!command.empty()){
+				std::string *commandPtr = &command;		
 
-		/*  check for Debug keyword to print the Debug version of Param object  */
-		std::string debug = "-Debug";
-		std::string toCompare;
+				/*  create Parse object to tokenize command input  */
+				char** tokenizedCommand = toParse.Tokenize(commandPtr); 
+
+				/*  create Param object and intialized variables with tokens
+				 *  check for errors within the tokenized command input 
+				 */
+				param.Initialize(tokenizedCommand, toParse.GetMaxTokens());
+				proceed = param.CheckExit();
+				/*
+				int argumentTwo = atoi(param.GetNumProcesses());
+				
+				if(argumentTwo == 0){
+					std::cout << "ERROR: second argument must be integer" << std::endl;
+					integer = false;
+				}
+				if(!integer){
+					std::cout << "i freed the memory\n";
+					toParse.FreeMemory();
+					param.FreeMemory();
+				}*/
+			}
+		}while(command.empty() || integer == false);
 		
-		for(int i = 0; i < argc; i++){
-			toCompare = *(argv+i);	
+		
+		if(proceed){
+			/*  check for Debug keyword to print the Debug version of Param object  */
+			std::string debug = "-Debug";
+			std::string toCompare;
 			
-			if(toCompare == debug){
-				param.PrintParams();
-				break;
+			
+			for(int i = 0; i < argc; i++){
+				toCompare = *(argv+i);	
+				
+				if(toCompare == debug){
+					param.PrintParams();
+					break;
+				}
+			}
+			
+			int processes = atoi(param.GetNumProcesses());
+			
+			for(int i = 0; i < processes; i++){
+				int pid = fork();
+				if(pid == 0){
+					if(param.GetOutputRedirect() != nullptr){
+						std::string outputName(param.GetOutputRedirect());
+						std::string txt = ".txt";
+						std::string num = std::to_string(i);
+						outputName.append(num);
+						outputName.append(txt);
+						outputName.erase(0,1);
+						char* fileName = const_cast<char*>(outputName.c_str());
+						freopen(fileName,"w",stdout);
+					}
+					
+					std::string tempSegment = std::to_string(i);
+					const char* segment = tempSegment.c_str();
+					
+					if(param.GetInputRedirect() == nullptr){
+						execlp(param.GetFileName(),param.GetFileName(),
+							param.GetNumProcesses(),segment,
+							param.GetRange(),NULL);
+					}
+					else{
+						std::string tempInput(param.GetInputRedirect());
+						tempInput.erase(0,1);
+						const char* inputRange = const_cast<const char*>(tempInput.c_str());
+						execlp(param.GetFileName(),param.GetFileName(),
+							param.GetNumProcesses(),segment,
+							inputRange,NULL);
+					}
+				}
+				else{
+					wait(NULL);
+
+				}
 			}
 		}
-		
-		int processes = atoi(param.getNumProcesses());
-		
-		for(int i = 0; i < processes; i++){
-			int pid = fork();
-			if(pid == 0){
-				std::string tempSegment = std::to_string(i);
-				const char* segment = tempSegment.c_str();
-				execlp(param.getFileName(),param.getFileName(),param.getNumProcesses(),segment,param.getInputRedirect(),NULL);
-			}
-			/*
-			else{
-				wait(NULL);
-			}
-			*/
-		}
-		wait(NULL);
 	}
 }

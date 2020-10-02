@@ -7,4 +7,4 @@ myshell: myshell.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	$(RM) *.o myshell
+	$(RM) *.o *.txt myshell

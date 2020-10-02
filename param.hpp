@@ -32,25 +32,9 @@ class Param{
 		/*  array of strings  */
 		char *argumentVector[MAXARGS];
 		
-		/** @brief Assigns tokens from a vector to respective variables.
-		 *
-		 *  This function uses an if-else structure to do error
-		 *  handling as well as to ensure that each word gets
-		 *  assigned to the correct class variable.
-		 *  This function cycles through each word in vector
-		 *  input command. It ensures that if there is a < or >
-		 *  at the beginning of a word, then it will store
-		 *  the word as inputRedirect or outputRedirect, depending
-		 *  on which way the arrow faces. It also ensures that the
-		 *  program will terminate if there is only a single < or >.
-		 *  All other words get stored in argumentVector[] and the		 
-		 *  argument count is increased with each word stored.
-		 *
-		 *  @param inputCommand Vector of parsed strings from user input.
-		 *  @return void
-		 */
-		void ParseCommandLine(std::vector<std::string>);
+
 	public:
+	
 		/** @brief Constructor
 		 *  
 		 *  Initializes input and output redirect to to NULL.
@@ -58,7 +42,7 @@ class Param{
 		 *
 		 *  @param Vector of parsed strings from user input
 		 */
-		Param(std::vector<std::string>);
+		Param();
 		
 		/** @brief prints summary of class variables
 		 *
@@ -81,12 +65,32 @@ class Param{
 		 *
 		 *  @return void
 		 */
-		void CheckArguments();
+		bool CheckExit();
 		
-		const char* getNumProcesses();
-		const char* getFileName();
-		const char* getInputRedirect();
-		
+		/** @brief Assigns tokens from a vector to respective variables.
+		 *
+		 *  This function uses an if-else structure to do error
+		 *  handling as well as to ensure that each word gets
+		 *  assigned to the correct class variable.
+		 *  This function cycles through each word in vector
+		 *  input command. It ensures that if there is a < or >
+		 *  at the beginning of a word, then it will store
+		 *  the word as inputRedirect or outputRedirect, depending
+		 *  on which way the arrow faces. It also ensures that the
+		 *  program will terminate if there is only a single < or >.
+		 *  All other words get stored in argumentVector[] and the		 
+		 *  argument count is increased with each word stored.
+		 *
+		 *  @param inputCommand Vector of parsed strings from user input.
+		 *  @return void
+		 */
+		void Initialize(char**,int);
+		const char* GetNumProcesses();
+		const char* GetFileName();
+		const char* GetRange();
+		const char* GetInputRedirect();
+		const char* GetOutputRedirect();
+		void FreeMemory();
 };
 
 #endif
