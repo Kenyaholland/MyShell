@@ -22,26 +22,41 @@
 
 class Param{
 	private:
-		/*  file name or NULL  */
 		char *inputRedirect;
 		char *outputRedirect;
-
-		/*  number of tokens in argument vector */
 		int argumentCount;
-
-		/*  array of strings  */
 		char *argumentVector[MAXARGS];
 	public:
-	
+		Param();
 		/** @brief Constructor
 		 *  
-		 *  Initializes input and output redirect to to NULL.
-		 *  Calls ParseCommandLine() and passes in the string vector.
+		 *  Initializes input and output redirect to to NULL
+		 *  and argumentCount to 0
 		 *
-		 *  @param Vector of parsed strings from user input
 		 */
-		Param();
 		
+		bool Initialize(char**,int);		
+		/** @brief Assigns tokens to respective variables.
+		 *
+		 *  This function uses an if-else structure to do error
+		 *  handling as well as to ensure that each word gets
+		 *  assigned to the correct class variable.
+		 *  This function cycles through each word in char* token[]
+		 *  and ensures that if there is a < or >
+		 *  at the beginning of a word, then it will store
+		 *  the word as inputRedirect or outputRedirect.
+		 *  It also ensures that the program will loop to user 
+		 *  input if there is only a single < or >.
+		 *  All other words get stored in argumentVector[] and		 
+		 *  argumentCount is increased with each word stored.
+		 *  The return value is a bool that will let the program
+		 *  know whether it should start from the user input.
+		 *
+		 *  @param char** tokens and int maxTokens
+		 *  @return bool
+		 */
+		
+		void PrintParams();
 		/** @brief prints summary of class variables
 		 *
 		 *  This functions makes a visual output of all the class variables
@@ -52,43 +67,39 @@ class Param{
 		 *
 		 *  @return void
 		 */
-		void PrintParams();
 		
+		void CheckExit();
 		/** @brief checks for exit and error handling
 		 *
-		 *  This function checks for keyword exit in any part of the command line entered,
-		 *  and will terminate when found.
-		 *  It also ensures that the second argument from the command is a number,
-		 *  otherwise the program will terminate.
+		 *  This function checks for keyword exit in any part of the 
+		 *  command line entered, and will terminate when found.
 		 *
 		 *  @return void
 		 */
-		void CheckExit();
+		
 		bool CheckArgumentTwo();
-		/** @brief Assigns tokens from a vector to respective variables.
+		/** @brief checks the argumentVector
 		 *
-		 *  This function uses an if-else structure to do error
-		 *  handling as well as to ensure that each word gets
-		 *  assigned to the correct class variable.
-		 *  This function cycles through each word in vector
-		 *  input command. It ensures that if there is a < or >
-		 *  at the beginning of a word, then it will store
-		 *  the word as inputRedirect or outputRedirect, depending
-		 *  on which way the arrow faces. It also ensures that the
-		 *  program will terminate if there is only a single < or >.
-		 *  All other words get stored in argumentVector[] and the		 
-		 *  argument count is increased with each word stored.
+		 *  Checks argumentVector[1] and make sure it is a number.
+		 *  Also checks to make sure there are more than two parameters
+		 *  entered by the user. If less than 2 user inputs, returns fasle
+		 *  and loops back to user input. If it is not a number, program
+		 *  will terminate. Otherwise, return true.
 		 *
-		 *  @param inputCommand Vector of parsed strings from user input.
-		 *  @return void
+		 *  @return bool
 		 */
-		bool Initialize(char**,int);
+		
 		char* GetNumProcesses();
 		char* GetFileName();
 		char* GetRange();
 		char* GetInputRedirect();
-		const char* GetOutputRedirect();
-		void FreeMemory();
+		char* GetOutputRedirect();
+		/** @brief getters
+		 *
+		 *	Getters that return the appropriate variables
+		 *
+		 *  @return char*
+		 */
 };
 
 #endif

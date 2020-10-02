@@ -1,7 +1,7 @@
 /** @file param.cpp
  *  @brief This Param object does error handling and assigns tokenized command input to variables
  *
- *  This object reads in a vector<string> which include words that have been parsed from the command line, 
+ *  This object reads in a char** which include words that have been parsed from the command line, 
  *  and stores them into their respective slot. This object can print the class variables assignments
  *  when the program is run in -Debug mode. Param also checks for keyword exit and invalid inputs.
  *
@@ -18,15 +18,11 @@ Param::Param(){
 }
 
 bool Param::Initialize(char** tokenizedCommand,int maxTokens){
-	/*  counter  */
 	int numOfArgs = 0;
 	
+	//loops through each token and assigns them correctly to the class variables
 	for(int i = 0; i < maxTokens; i++){
-		/*  checks for < or > with a size = 1, terminating program.
-		 *  checks for < or > with size > 1, assigning them to inputRedirect or outputRedirect.
-                 *  all other strings are assigned to argumentVector[],
-		 *  and increment the counter for the total number of arguments.
-		 */
+		 //checks token to see if it only consist of a single character < or >
 		if(tokenizedCommand[i][0] == '<' && tokenizedCommand[i][1] == '\0'){
 			std::cout << "ERROR: specify input name" << std::endl;
 			return false;
@@ -35,19 +31,26 @@ bool Param::Initialize(char** tokenizedCommand,int maxTokens){
 			std::cout << "ERROR: specify output name" << std::endl;
 			return false;
 		}
+		//assigns to input or output redirect if the token is accompanied by > or <
 		else if(tokenizedCommand[i][0] == '<' && tokenizedCommand[i][0] != '\0'){
 			this->inputRedirect = tokenizedCommand[i];
 		}
 		else if(tokenizedCommand[i][0] == '>' && tokenizedCommand[i][0] != '\0'){
 			this->outputRedirect = tokenizedCommand[i];
 		}
+		//assigns all other tokens to the argumentVector
 		else{
 			this->argumentVector[numOfArgs] = tokenizedCommand[i];
 			numOfArgs++;
+			//keeps trak of the index
 		}
 	}
 	
+	//initialized the argumentCount
 	this->argumentCount = numOfArgs;
+	
+	//returns false due to error to skip evrything and tne loops back to user input
+	//otherwise, returns true
 	return true;
 }
 
@@ -67,10 +70,8 @@ void Param::CheckExit(){
 	std::string toExit = "exit";
 	std::string toCompare;
 
-	/*  loops through argumentVector[],
-	 *  sets toCompare with argumentVector[i]
-	 *  and compares it with toExit
-	 */
+	//loops through argumentVector[] and compares it with "exit"
+	//if true, will terminate
 	for(int i = 0; i < argumentCount; i++){
 		toCompare = this->argumentVector[i];
 	
@@ -82,11 +83,14 @@ void Param::CheckExit(){
 }
 
 bool Param::CheckArgumentTwo(){
+	//returns false to loop back to user input when there are less than 2 comman inputs
 	if(argumentCount < 2){
 		std::cout << "ERROR: enter correct filename and/or number of processes" << std::endl;
 		return false;
 	}
 	
+	//checks to see if the argumentVector[1] is a number
+	//if fase, then program will terminate
 	if(argumentCount > 1){
 		int argumentTwo = atoi(this->argumentVector[1]);
 	
@@ -100,36 +104,21 @@ bool Param::CheckArgumentTwo(){
 }
 
 char* Param::GetNumProcesses(){
-	//const char* processes = this->argumentVector[1];
 	return this->argumentVector[1];
 }
 
 char* Param::GetFileName(){
-	//const char *name = this->argumentVector[0];
 	return this->argumentVector[0];
 }
 
 char* Param::GetRange(){
-	//const char *range = this->argumentVector[2];
 	return this->argumentVector[2];
 }
 
 char* Param::GetInputRedirect(){
-	//const char* input = this->inputRedirect;
 	return this->inputRedirect;
 }
 
-const char* Param::GetOutputRedirect(){
-	const char* output = this->outputRedirect;
-	return output;
-}
-
-void Param::FreeMemory(){
-	for(int i = 0; i < this->argumentCount; i++){
-		delete[] this->argumentVector[i];
-	}
-	//delete[] this->argumentVector;
-	this->inputRedirect = nullptr;
-	this->outputRedirect = nullptr;
-	this->argumentCount = 0;
+char* Param::GetOutputRedirect(){
+	return this->outputRedirect;
 }

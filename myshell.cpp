@@ -24,39 +24,47 @@
 #include "param.hpp"
 
 int main(int argc, char *argv[]){
+	//a bool that controls the loop until user exits or error
 	bool proceed = true;
-	/*  loops until exit entered by user or error in command line  */
+	
 	while(proceed == true){
-		/*  local variables  */
-		
 		std::string command;
 		Parse toParse;
 		Param param;
-		/*  read in user command input  */
+
+		//loops if string is empty
 		do{
 			std::cout << "\n$$$ ";
 			std::getline(std::cin, command);
 
+			//will not execute if there was no user input
 			if(!command.empty()){
+				//get the address of user input
 				std::string *commandPtr = &command;		
-
-				/*  create Parse object to tokenize command input  */
+				
+				//create a char** to hold the address of the tokens when parsed
 				char** tokenizedCommand = toParse.Tokenize(commandPtr); 
 
-				/*  create Param object and intialized variables with tokens
-				 *  check for errors within the tokenized command input 
-				 */
+				//initialized the tokens to an param object
+				//returns false if there were errors with < and >
+				//and will loop back to user input
 				proceed = param.Initialize(tokenizedCommand, toParse.GetMaxTokens());
+				
+				//if user entered "exit", program will terminate
 				param.CheckExit();
 				
+				//if there were no errors with < or >, then argument two is checked
+				//will loop back to user input if there were less than 2 user inputs
+				//or if argumentVector[1] in the param object was not a number
 				if(proceed == true){
 					proceed = param.CheckArgumentTwo();
 				}
 			}
 		}while(command.empty());
 		
+		//skips if errors were found in previous function
 		if(proceed == true){
-			/*  check for Debug keyword to print the Debug version of Param object  */
+			//checks for "-Debug" and if ture, will print parameter values
 			std::string debug = "-Debug";
 			std::string toCompare;
 			
@@ -69,66 +77,124 @@ int main(int argc, char *argv[]){
 				}
 			}
 			
+			//get the number of processes and convert it to an int
 			int processes = atoi(param.GetNumProcesses());
+			
+			//controls the exit status of a child process
 			int failed = 0;
 			
+			//loops and create x amount of processes specified by users
 			for(int i = 0; i < processes; i++){
 				int pid = fork();
+				
+				//if current process is the child
 				if(pid == 0){
-					if(param.GetOutputRedirect() != nullptr){
-						std::string outputName(param.GetOutputRedirect());
-						std::string txt = ".txt";
-						std::string num = std::to_string(i);
-						outputName.append(num);
-						outputName.append(txt);
-						outputName.erase(0,1);
-						char* fileName = const_cast<char*>(outputName.c_str());
-						freopen(fileName,"w",stdout);
-					}
-					
-					std::string indexStr = std::to_string(i);
+					//converts the int i to a char* to use as the index
+					std::string indexStr = std::to_string(i);					
 					char *indexChar = const_cast<char*>(indexStr.c_str());
+					
+					//holds the value of the range to be passed in exec()
+					char *valueChar = nullptr;
+					
+					//to hold the value from input redirect
+					int valueInt;
+					
+					//if user specified an input redirect with <
+					if(param.GetInputRedirect() != nullptr){
+						//return the file name from param and append
+						//".txt" to the end of the file,
+						//also delete the "<" at the front of the name
+						std::string inputFileName(param.GetInputRedirect());
+						std::string txt = ".txt";
+						inputFileName.erase(0,1);
+						inputFileName.append(txt);
+
+						//open the file
+						FILE *fileIn = freopen(inputFileName.c_str(),"r",stdin);
 						
-					std::string tempInput;
+						//if file failed, exit
+						if(fileIn == NULL){
+							std::cout << "ERROR: input file not found" << std::endl;
+							exit(1);
+						}
 						
-					if(param.GetInputRedirect() != nullptr){	
-						tempInput = param.GetInputRedirect();
-						tempInput.erase(0,1);
-					}
-					else{
-						tempInput = param.GetRange();
+						//read in the value in the file
+						std::cin >> valueInt;
+						fclose(fileIn);
 					}
 					
-					char* value = const_cast<char*>(tempInput.c_str());
-						
+					//convert the read in value to a char*
+					std::string valueStr = std::to_string(valueInt);
+					valueChar = const_cast<char*>(valueStr.c_str());
+					
+					//if user did not specify an input redirect,
+					//then a number entered by the user will be useds
+					if(param.GetInputRedirect() == nullptr){
+						valueChar = const_cast<char*>(param.GetRange());
+					}
+					
+					//initialized char* args[] to be passed into execvp()
+					//values initialized were return from param object or
+					//from values calculated above
 					char* args[] = {
 						param.GetFileName(),
 						param.GetNumProcesses(),
 						indexChar,
-						value,
+						valueChar,
 						NULL
 					};
+					
+					//if an output redirect was specified
+					if(param.GetOutputRedirect() != nullptr){
+						//return the file name from param object
+						std::string outputFileName(param.GetOutputRedirect());
+						std::string txt = ".txt";
 						
+						//append the index and ".txt" and delete ">"
+						outputFileName.append(indexStr);
+						outputFileName.append(txt);
+						outputFileName.erase(0,1);
+						
+						//create and open the file
+						FILE *fileOut = freopen(outputFileName.c_str(),"w",stdout);
+						
+						//exit if error occurred
+						if(fileOut == NULL){
+							std::cout << "ERROR: cannot create file" << std::endl;
+							exit(1);
+						}
+						
+						//fclose(fileOut);
+					}
+					
+					//execute the program
 					failed = execvp(args[0], args);
-						
+					
+					//if failed, then will exit(1) which will led the
+					//parent know to terminate the program
 					if(failed == -1){
-						std::cout << "ERROR: file not found" << std::endl;
 						exit(1);
 					}
 				}
-				else{
-					int status;
-					wait(&status);
-					if(status == 256){
-						std::cout << "PROGRAM TERMINATED" << std::endl;
-						exit(1);
-					}
-
+			}
+			//wait for how many times the program created a new processes
+			for(int i = 0; i < processes; i++){
+				//returns the exit status of the child
+				int status;
+				wait(&status);
+				
+				//if status was an error, terminate the program
+				if(status == 256){
+					std::cout << "ERROR: file not found" << std::endl;
+					std::cout << "PROGRAM TERMINATED" << std::endl;
+					exit(1);
 				}
-			}	
+			
+			}
 		}
-		//param.FreeMemory();
 		//toParse.FreeMemory();
+		
+		//set to true to loop until error or user exit
 		proceed = true;	
 	}
 }
